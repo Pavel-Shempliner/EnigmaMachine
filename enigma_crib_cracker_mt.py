@@ -57,9 +57,9 @@ def crack_with_crib_mt(ciphertext, crib, plugboard_pairs=None):
             if result:
                 found.extend(result)
 
-    with open("decoded_matches_mt.txt", "w") as f:
-        for (rotor_ids, pos), decoded in found:
-            f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}\n")
+    # with open("decoded_matches_mt.txt", "w") as f:
+    #     for (rotor_ids, pos), decoded in found:
+    #         f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}\n")
 
     return found
 
@@ -68,7 +68,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     plugboard_settings = {'A': 'B', 'C': 'D'}
-    plaintext = "HELLOWORLD"
+    plaintext = "HELLO WORLD"
+    print(f"{plaintext=}")
 
     test_rotors = [
         Rotor(*ROTOR_WIRINGS['I'], position='A'),
@@ -80,6 +81,8 @@ if __name__ == "__main__":
     test_machine = EnigmaMachine(test_rotors, test_reflector, test_plugboard)
     ciphertext = test_machine.encode_message(plaintext)
     print("Generated Ciphertext:", ciphertext)
+    test_machine.reset_rotors()
+    print(f"Decrypted message - {test_machine.encode_message(ciphertext)}")
 
     crib = "HELLO"
     matches = crack_with_crib_mt(ciphertext, crib, plugboard_settings)

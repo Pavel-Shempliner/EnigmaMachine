@@ -22,20 +22,29 @@ class Rotor:
 
     def encode_backward(self, c: str) -> str:
         pos_offset = string.ascii_uppercase.index(self.position)
-        for i in range(26):
-            shifted_index = (i + pos_offset) % 26
-            if self.wiring[shifted_index] == c:
-                result = string.ascii_uppercase[i]
-                logger.debug(f"  Rotor {self.wiring[:4]} (bwd): {c} -> {result} [pos {self.position}]")
-                return result
-        raise ValueError(f"Character {c} not found in wiring during backward encoding")
+        # Adjust for position offset (opposite direction as forward path)
+        adjusted_c_idx = (string.ascii_uppercase.index(c) + pos_offset) % 26
+        adjusted_c = string.ascii_uppercase[adjusted_c_idx]
+
+        # Find where this letter would be output in the wiring
+        wired_idx = self.wiring.find(adjusted_c)
+
+        # Adjust back for position offset
+        result_idx = (wired_idx - pos_offset) % 26
+        result = string.ascii_uppercase[result_idx]
+
+        logger.debug(
+            f"  Rotor {self.wiring[:4]} (bwd): {c} -> {result} [pos {self.position}]"
+        )
+        return result
+
 
     def step(self):
+        was_at_notch = self.position == self.notch
         prev_pos = self.position
         self.position = string.ascii_uppercase[(string.ascii_uppercase.index(self.position) + 1) % 26]
         logger.debug(f"  Stepping rotor from {prev_pos} to {self.position} (notch at {self.notch})")
-        return self.position == self.notch
-
+        return was_at_notch
 
 class Reflector:
     def __init__(self, wiring: str):
@@ -63,6 +72,7 @@ class Plugboard:
 
 class EnigmaMachine:
     def __init__(self, rotors: list, reflector: Reflector, plugboard: Plugboard):
+        self._initial_positions = [rotor.position for rotor in rotors]
         self.rotors = rotors
         self.reflector = reflector
         self.plugboard = plugboard
@@ -74,11 +84,19 @@ class EnigmaMachine:
         logger.debug(f"\nEncoding letter: {c}")
 
         # Step the rotors (right to left)
-        rotate_next = self.rotors[-1].step()
-        if rotate_next and len(self.rotors) > 1:
-            rotate_next = self.rotors[-2].step()
-            if rotate_next and len(self.rotors) > 2:
-                self.rotors[-3].step()
+        if len(self.rotors) >= 1:
+            step_right = self.rotors[-1].step()
+        else:
+            step_right = False
+
+        if len(self.rotors) >= 2:
+            step_middle = self.rotors[-2].step() if step_right else False
+        else:
+            step_middle = False
+
+        if len(self.rotors) >= 3 and step_middle:
+            self.rotors[-3].step()
+
 
         # Plugboard in
         c = self.plugboard.swap(c)
@@ -99,6 +117,10 @@ class EnigmaMachine:
 
         logger.debug(f"  Final encoded letter: {c}")
         return c
+
+    def reset_rotors(self):
+        for rotor, initial_pos in zip(self.rotors, self._initial_positions):
+            rotor.position = initial_pos
 
     def encode_message(self, message: str) -> str:
         message = message.upper().replace(' ', '')
@@ -127,14 +149,28 @@ def main():
         Rotor(*ROTOR_WIRINGS['III'], position='A')
     ]
     reflector = Reflector(REFLECTOR_B)
-    plugboard = Plugboard({'A': 'B', 'C': 'D'})
+    plugboard = Plugboard({"A": "B", "C": "D"})
 
     # Create the machine
     machine = EnigmaMachine(rotors, reflector, plugboard)
 
+    # Setup example
+    rotors_test = [
+        Rotor(*ROTOR_WIRINGS["I"], position="A"),
+        Rotor(*ROTOR_WIRINGS["II"], position="A"),
+        Rotor(*ROTOR_WIRINGS["III"], position="A"),
+    ]
+    reflector_test = Reflector(REFLECTOR_B)
+    plugboard_test = Plugboard({'A': 'B', 'C': 'D'})
+
+    # Create the machine
+    machine_test = EnigmaMachine(rotors_test, reflector_test, plugboard_test)
+
     # Encode a message
-    encoded = machine.encode_message("HELLOWORLD")
+    encoded = machine.encode_message("HELLO WORLD")
     print("\nEncoded:", encoded)
+    decoded = machine_test.encode_message(encoded)
+    print("\nDecoded:", decoded)
 
 
 if __name__ == "__main__":
