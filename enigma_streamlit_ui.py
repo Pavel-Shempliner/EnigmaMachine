@@ -8,13 +8,21 @@ st.title("🔐 Enigma Machine Simulator")
 plaintext = st.text_input("Enter your message:", "HELLO WORLD")
 rotor_choices = list(ROTOR_WIRINGS.keys())
 
-rotor1 = st.selectbox("Rotor 1", rotor_choices, index=0)
-rotor2 = st.selectbox("Rotor 2", rotor_choices, index=1)
-rotor3 = st.selectbox("Rotor 3", rotor_choices, index=2)
+col1, col2, col3 = st.columns(3)
+with col1:
+    rotor1 = st.selectbox("Rotor 1", rotor_choices, index=0)
+with col2:
+    rotor2 = st.selectbox("Rotor 2", rotor_choices, index=1)
+with col3:
+    rotor3 = st.selectbox("Rotor 3", rotor_choices, index=2)
 
-pos1 = st.selectbox("Rotor 1 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
-pos2 = st.selectbox("Rotor 2 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
-pos3 = st.selectbox("Rotor 3 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
+col4, col5, col6 = st.columns(3)
+with col4:
+    pos1 = st.selectbox("Rotor 1 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
+with col5:
+    pos2 = st.selectbox("Rotor 2 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
+with col6:
+    pos3 = st.selectbox("Rotor 3 Position", list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), index=0)
 
 plugboard_input = st.text_input("Plugboard Pairs (e.g., A:B,C:D):", "A:B,C:D")
 
@@ -26,7 +34,7 @@ try:
             a, b = pair.strip().upper().split(':')
             plugboard_pairs[a] = b
             plugboard_pairs[b] = a
-except:
+except ValueError:
     st.warning("Invalid plugboard format. Use format like A:B,C:D")
 
 # Setup machine
