@@ -1,68 +1,48 @@
 # Enigma Machine Simulator
 
-A Python-based simulator for the WWII-era Enigma machine, supporting rotor selection, plugboard configuration, and accurate encryption logic.
+A web-based Enigma machine simulator built with Python and Streamlit. This project replicates the functionality of the historical German Enigma machine used during WWII.
 
 ## Features
+- Web-based user interface (via Streamlit)
 - Authentic simulation of a 3-rotor Enigma machine
-- Configurable rotors, plugboard swaps, and reflector
-- Accurate rotor stepping and encoding logic
-- Support for encode-decode symmetry
-- Includes test harness to verify correctness
-- Logging support to debug the encoding process
+- User-configurable rotors, plugboard wiring, and starting positions
+- Symmetric encryption/decryption
+- Instructions panel for historical usage reference
 
-## Usage
+## How to Run
 
-### Encoding a message
-```python
-from enigma_machine_sim import EnigmaMachine, Rotor, Reflector, Plugboard, ROTOR_WIRINGS, REFLECTOR_B
-
-rotors = [
-    Rotor(*ROTOR_WIRINGS['I'], position='A'),
-    Rotor(*ROTOR_WIRINGS['II'], position='A'),
-    Rotor(*ROTOR_WIRINGS['III'], position='A')
-]
-
-reflector = Reflector(REFLECTOR_B)
-plugboard = Plugboard({'A': 'B', 'C': 'D'})
-machine = EnigmaMachine(rotors, reflector, plugboard)
-
-plaintext = "HELLOWORLD"
-ciphertext = machine.encode_message(plaintext)
-print("Encoded:", ciphertext)
-
-machine.reset_rotors()
-decoded = machine.encode_message(ciphertext)
-print("Decoded:", decoded)
+### 1. Clone the repository
+```bash
+git clone https://github.com/yourusername/enigma-simulator.git
+cd enigma-simulator
 ```
 
-### Cracking a message (with crib)
-```python
-from enigma_crib_cracker import crack_with_crib
-
-ciphertext = "..."  # Replace with encoded message
-crib = "HELLO"
-found_matches = crack_with_crib(ciphertext, crib, plugboard_pairs={'A': 'B', 'C': 'D'})
+### 2. Install requirements
+```bash
+pip install -r requirements.txt
 ```
 
-### Multithreaded cracking
-```python
-from enigma_crib_cracker_mt import crack_with_crib_mt
-
-matches = crack_with_crib_mt(ciphertext, crib, plugboard_pairs={'A': 'B', 'C': 'D'})
+### 3. Launch the Streamlit app
+```bash
+streamlit run enigma_streamlit_ui.py
 ```
 
-## File Structure
-- `enigma_machine_sim.py`: Main simulation logic
-- `enigma_crib_cracker.py`: Single-threaded Enigma cracker using known crib
-- `enigma_crib_cracker_mt.py`: Multithreaded version for faster cracking
+## How to Use
+- Enter your plaintext message
+- Select rotors and initial positions
+- Configure plugboard swaps (if desired)
+- Click **Encode / Decode** to process your message
+- Use the same configuration to decode
+
+## Screenshot
+_Add a screenshot here if desired._
 
 ## Requirements
 - Python 3.7+
-- tqdm (for progress bars)
+- Streamlit
 
 ## License
 This project is for educational and non-commercial use.
 
 ---
-
-Built to explore historical cryptography and test cracking techniques used during WWII.
+Built to explore historical cryptography in an interactive way.
