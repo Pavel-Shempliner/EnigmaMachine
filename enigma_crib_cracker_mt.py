@@ -1,10 +1,18 @@
-from enigma_machine_sim import EnigmaMachine, Rotor, Reflector, Plugboard, ROTOR_WIRINGS, REFLECTOR_B
-import string
 import itertools
-from tqdm import tqdm
 import logging
+import string
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
+
+from enigma_machine_sim import (
+    REFLECTOR_B,
+    ROTOR_WIRINGS,
+    EnigmaMachine,
+    Plugboard,
+    Reflector,
+    Rotor,
+)
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,11 @@
-import pytest
-from enigma_machine_sim import EnigmaMachine, Rotor, Reflector, Plugboard, ROTOR_WIRINGS, REFLECTOR_B
+from enigma_machine_sim import (
+    REFLECTOR_B,
+    ROTOR_WIRINGS,
+    EnigmaMachine,
+    Plugboard,
+    Reflector,
+    Rotor,
+)
 
 rotor_ids = ('I', 'II', 'III')
 positions = ('A', 'A', 'A')

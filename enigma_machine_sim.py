@@ -1,5 +1,5 @@
-import string
 import logging
+import string
 from typing import Dict
 
 logging.basicConfig(level=logging.INFO)

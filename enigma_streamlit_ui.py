@@ -1,11 +1,11 @@
 import streamlit as st
 from enigma_machine_sim import (
-    EnigmaMachine,
-    Rotor,
-    Reflector,
-    Plugboard,
-    ROTOR_WIRINGS,
     REFLECTOR_B,
+    ROTOR_WIRINGS,
+    EnigmaMachine,
+    Plugboard,
+    Reflector,
+    Rotor,
 )
 
 st.set_page_config(page_title="Enigma Machine Simulator", layout="wide")
