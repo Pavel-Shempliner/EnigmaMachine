@@ -50,26 +50,61 @@ def crack_with_crib_mt(ciphertext, crib, plugboard_pairs=None):
         for rotor_ids in rotor_orders:
             for i in range(0, len(positions), chunk_size):
                 chunk = positions[i:i+chunk_size]
-                futures.append(executor.submit(crack_chunk, rotor_ids, chunk, ciphertext, crib, plugboard_pairs))
+                futures.append(
+                    executor.submit(
+                        crack_chunk, rotor_ids, chunk, ciphertext, crib, plugboard_pairs)
+                )
 
         for future in tqdm(as_completed(futures), total=len(futures), desc="Processing"):
             result = future.result()
             if result:
                 found.extend(result)
 
-    # with open("decoded_matches_mt.txt", "w") as f:
-    #     for (rotor_ids, pos), decoded in found:
-    #         f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}\n")
+    with open("decoded_matches_mt.txt", "w") as f:
+        for (rotor_ids, pos), decoded in found:
+            f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}")
 
     return found
 
 
+# Test harness: validate encode -> decode cycle for fixed settings
+# def test_enigma_cycle():
+#     plugboard_settings = {'A': 'B', 'C': 'D'}
+#     plaintext = "HELLOWORLD"
+#     rotor_ids = ('I', 'II', 'III')
+#     rotor_positions = 'AAA'
+#
+#     rotors = [
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[0]], position=rotor_positions[0]),
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[1]], position=rotor_positions[1]),
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[2]], position=rotor_positions[2])
+#     ]
+#     reflector = Reflector(REFLECTOR_B)
+#     plugboard = Plugboard(plugboard_settings)
+#     machine = EnigmaMachine(rotors, reflector, plugboard)
+#
+#     ciphertext = machine.encode_message(plaintext)
+#     print("[Test] Ciphertext:", ciphertext)
+#
+#     # Reset rotors to same position and decode
+#     rotors = [
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[0]], position=rotor_positions[0]),
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[1]], position=rotor_positions[1]),
+#         Rotor(*ROTOR_WIRINGS[rotor_ids[2]], position=rotor_positions[2])
+#     ]
+#     machine = EnigmaMachine(rotors, reflector, plugboard)
+#     decoded = machine.encode_message(ciphertext)
+#     print("[Test] Decoded:", decoded)
+#     assert decoded == plaintext, f"Decoded '{decoded}' does not match original '{plaintext}'"
+
+
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    # test_enigma_cycle()
     logging.basicConfig(level=logging.INFO)
 
     plugboard_settings = {'A': 'B', 'C': 'D'}
-    plaintext = "HELLO WORLD"
-    print(f"{plaintext=}")
+    plaintext = "HELLOWORLD"
 
     test_rotors = [
         Rotor(*ROTOR_WIRINGS['I'], position='A'),
@@ -81,8 +116,6 @@ if __name__ == "__main__":
     test_machine = EnigmaMachine(test_rotors, test_reflector, test_plugboard)
     ciphertext = test_machine.encode_message(plaintext)
     print("Generated Ciphertext:", ciphertext)
-    test_machine.reset_rotors()
-    print(f"Decrypted message - {test_machine.encode_message(ciphertext)}")
 
     crib = "HELLO"
     matches = crack_with_crib_mt(ciphertext, crib, plugboard_settings)
