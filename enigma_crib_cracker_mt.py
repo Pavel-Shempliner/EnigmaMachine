@@ -70,7 +70,7 @@ def crack_with_crib_mt(ciphertext, crib, plugboard_pairs=None):
 
     with open("decoded_matches_mt.txt", "w") as f:
         for (rotor_ids, pos), decoded in found:
-            f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}")
+            f.write(f"Rotors: {rotor_ids}, Position: {pos}, Decoded: {decoded}\n")
 
     return found
 
